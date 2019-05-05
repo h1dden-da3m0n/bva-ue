@@ -15,6 +15,14 @@ public class ImageTransformationFilter {
     return returnImg;
   }
 
+  public static int[] GetTransformed1DImage(int[] inImg, int size, int[] transferFunction) {
+    int[] returnImg = new int[size];
+    for (int pos = 0; pos < size; pos++) {
+      returnImg[pos]= transferFunction[inImg[pos]];
+    }
+    return returnImg;
+  }
+
   public static int[] GetInversionTF(int maxVal) {
     int[] returnTF = new int[maxVal + 1];
 
@@ -94,4 +102,48 @@ public class ImageTransformationFilter {
     return returnTF;
   }
 
+  public static int[] GetOptimalThresholdTF(int maxVal, int[] inImg, int size, int iterations, int FG_VAL, int BG_VAL) {
+    int[] returnTF = new int[maxVal + 1];
+
+    int lftSum = 0;
+    int lftCnt = 0;
+    int rgtSum = 0;
+    int rgtCnt = 0;
+    int threshold = 127;
+
+    for (int i = 0; i < iterations; i++) {
+      for (int pos = 0; pos < size; pos++) {
+        if (inImg[pos] < threshold) {
+          lftSum += inImg[pos];
+          lftCnt++;
+        } else {
+          rgtSum += inImg[pos];
+          rgtCnt++;
+        }
+      }
+
+      int newThreshold = threshold;
+      if (lftCnt != 0 && rgtCnt != 0) {
+        int leftMean = lftSum / lftCnt;
+        int rightMean = rgtSum / rgtCnt;
+        newThreshold = (leftMean + rightMean) / 2;
+      }
+      else if (lftCnt != 0)
+        newThreshold = lftSum / lftCnt;
+      else if (rgtCnt != 0)
+        newThreshold = rgtSum / rgtCnt;
+
+      if (threshold == newThreshold) break;
+      threshold = newThreshold;
+    }
+
+    for (int i = 0; i <= maxVal; i++) {
+      if (i <= threshold)
+        returnTF[i] = BG_VAL;
+      else
+        returnTF[i] = FG_VAL;
+    }
+
+    return returnTF;
+  }
 }
