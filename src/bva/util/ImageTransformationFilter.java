@@ -109,11 +109,14 @@ public class ImageTransformationFilter {
     int lftCnt = 0;
     int rgtSum = 0;
     int rgtCnt = 0;
-    int threshold = 127;
+    // threshold can be initialized with center of max value: 255/2 = 127.5
+    int thold = 127;
 
-    for (int i = 0; i < iterations; i++) {
-      for (int pos = 0; pos < size; pos++) {
-        if (inImg[pos] < threshold) {
+    // try to improve threshold till optimum or max of iterations is reached
+    for (int i = 0; i < iterations; ++i) {
+      // calculate the left and right sites of values separated by the current threshold
+      for (int pos = 0; pos < size; ++pos) {
+        if (inImg[pos] < thold) {
           lftSum += inImg[pos];
           lftCnt++;
         } else {
@@ -122,23 +125,27 @@ public class ImageTransformationFilter {
         }
       }
 
-      int newThreshold = threshold;
+      // based on left & right side attempt to improve threshold
+      int newThold = thold;
       if (lftCnt != 0 && rgtCnt != 0) {
         int leftMean = lftSum / lftCnt;
         int rightMean = rgtSum / rgtCnt;
-        newThreshold = (leftMean + rightMean) / 2;
+        newThold = (leftMean + rightMean) / 2;
       }
       else if (lftCnt != 0)
-        newThreshold = lftSum / lftCnt;
+        newThold = lftSum / lftCnt;
       else if (rgtCnt != 0)
-        newThreshold = rgtSum / rgtCnt;
+        newThold = rgtSum / rgtCnt;
 
-      if (threshold == newThreshold) break;
-      threshold = newThreshold;
+      // stop if current threshold is optimum threshold
+      if (thold == newThold)
+        break;
+
+      thold = newThold;
     }
 
-    for (int i = 0; i <= maxVal; i++) {
-      if (i <= threshold)
+    for (int i = 0; i <= maxVal; ++i) {
+      if (i <= thold)
         returnTF[i] = BG_VAL;
       else
         returnTF[i] = FG_VAL;

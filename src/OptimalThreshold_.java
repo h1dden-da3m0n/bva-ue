@@ -37,8 +37,8 @@ public class OptimalThreshold_ implements PlugInFilter {
 
     int FG_VAL = 255;
     int BG_VAL = 0;
-    int widthOffset = 0;
-    int heightOffset = 0;
+    int wOffset = 0;
+    int hOffset = 0;
 
     // get px per Sector
     int[] sectorWidths = new int[nrOfSectors];
@@ -56,26 +56,25 @@ public class OptimalThreshold_ implements PlugInFilter {
     for (int row = 0; row < nrOfSectors; ++row) {
       // calculate proper height offset for current sector
       int sectorHeight = sectorHeights[row];
-      if (heightOffset != 0 && (heightOffset - pxOverlap) > 0) {
-        heightOffset -= pxOverlap;
+      if (hOffset != 0 && (hOffset - pxOverlap) > 0) {
+        hOffset -= pxOverlap;
         sectorHeight += pxOverlap;
       }
 
       for (int col = 0; col < nrOfSectors; ++col) {
         // calculate proper width offset for current sector
         int sectorWidth = sectorWidths[col];
-        if (widthOffset != 0 && (widthOffset - pxOverlap) > 0) {
-          widthOffset -= pxOverlap;
+        if (wOffset != 0 && (wOffset - pxOverlap) > 0) {
+          wOffset -= pxOverlap;
           sectorWidth += pxOverlap;
         }
 
+        // get actual image values for the current sector with offset (if given)
         int sectorPxSize = sectorWidth * sectorHeight;
         int[] sector = new int[sectorPxSize];
-
-        // get actual image values for the current sector
         int idx = 0;
-        for (int w = widthOffset; w < (widthOffset + sectorWidth); ++w) {
-          for (int h = heightOffset; h < (heightOffset + sectorHeight); ++h) {
+        for (int w = wOffset; w < (wOffset + sectorWidth); ++w) {
+          for (int h = hOffset; h < (hOffset + sectorHeight); ++h) {
             sector[idx] = inDataArrInt[w][h];
             ++idx;
           }
@@ -88,18 +87,18 @@ public class OptimalThreshold_ implements PlugInFilter {
 
         // propagate back the newly calculated image with the optimal threshold applied
         idx = 0;
-        for (int w = widthOffset; w < (widthOffset + sectorWidth); ++w) {
-          for (int h = heightOffset; h < (heightOffset + sectorHeight); ++h) {
+        for (int w = wOffset; w < (wOffset + sectorWidth); ++w) {
+          for (int h = hOffset; h < (hOffset + sectorHeight); ++h) {
             inDataArrInt[w][h] = resultImg[idx];
             ++idx;
           }
         }
 
-        widthOffset += sectorWidth;
+        wOffset += sectorWidth;
       }
 
-      widthOffset = 0;
-      heightOffset += sectorHeight;
+      wOffset = 0;
+      hOffset += sectorHeight;
     }
 
     ImageJUtility.showNewImage(inDataArrInt, width, height,

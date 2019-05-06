@@ -98,7 +98,7 @@ public class KMeansClustering_ implements PlugInFilter {
   } //run
 
   // adds a value to a cluster, formula ref: Slide set "Segmentation" Slide 40
-  private double[] addValue(double[] cluster, int N, int[] rgb) {
+  private double[] addToCluster(double[] cluster, int N, int[] rgb) {
     for (int i = 0; i < 3; ++i)
       cluster[i] = (cluster[i] * N + rgb[i]) / (N + 1);
 
@@ -106,7 +106,7 @@ public class KMeansClustering_ implements PlugInFilter {
   }
 
   // removes a value from a cluster, formula ref: Slide set "Segmentation" Slide 40
-  private double[] removeValue(double[] cluster, int N, int[] rgb) {
+  private double[] removeFromCluster(double[] cluster, int N, int[] rgb) {
     for (int i = 0; i < 3; ++i)
       cluster[i] = (cluster[i] * N - rgb[i]) / (N - 1);
 
@@ -131,14 +131,14 @@ public class KMeansClustering_ implements PlugInFilter {
 
           // add value to new cluster
           double[] cn = inClusters.get(idx);
-          cn = addValue(cn, pxPerSector[idx], rgb);
+          cn = addToCluster(cn, pxPerSector[idx], rgb);
           pxPerSector[idx] += 1;
           inClusters.set(idx, cn);
 
           // remove value from an old cluster, should that value already have a cluster assigned
           if (oldBestClusterIdx != -1) {
             double[] cm = inClusters.get(oldBestClusterIdx);
-            cm = removeValue(cm, pxPerSector[oldBestClusterIdx], rgb);
+            cm = removeFromCluster(cm, pxPerSector[oldBestClusterIdx], rgb);
             pxPerSector[oldBestClusterIdx] -= 1;
             inClusters.set(oldBestClusterIdx, cm);
           }
