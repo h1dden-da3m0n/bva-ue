@@ -17,94 +17,32 @@ public class OptimalThreshold_ implements PlugInFilter {
   } //setup
 
   public void run(ImageProcessor ip) {
+    byte[] pixels = (byte[]) ip.getPixels();
+    int width = ip.getWidth();
+    int height = ip.getHeight();
+    int[][] inDataArrInt = ImageJUtility.convertFrom1DByteArr(pixels, width, height);
+
     GenericDialog gd = new GenericDialog("Optimal Threshold Settings");
-    gd.addNumericField("# of Sectors:", 4, 0);
-    gd.addNumericField("Sector Overlap (px):", 2, 0);
     gd.addNumericField("Iterations:", 10, 0);
     gd.showDialog();
     if (gd.wasCanceled()) {
       return;
     } //if
 
-    int nrOfSectors = (int) gd.getNextNumber();
-    int pxOverlap = (int) gd.getNextNumber();
     int iterations = (int) gd.getNextNumber();
-
-    byte[] pixels = (byte[]) ip.getPixels();
-    int width = ip.getWidth();
-    int height = ip.getHeight();
-    int[][] inDataArrInt = ImageJUtility.convertFrom1DByteArr(pixels, width, height);
-
     int FG_VAL = 255;
     int BG_VAL = 0;
-    int wOffset = 0;
-    int hOffset = 0;
 
-    // get px per Sector
-    int[] sectorWidths = new int[nrOfSectors];
-    int[] sectorHeights = new int[nrOfSectors];
-    for (int i = 0; i < nrOfSectors; ++i) {
-      sectorWidths[i] = width / nrOfSectors;
-      sectorHeights[i] = height / nrOfSectors;
-    }
-    // add rest of px if height or width isn't a multiple of nrOfSectors
-    for (int i = width % nrOfSectors; i > 0; --i)
-      sectorWidths[i - 1] += 1;
-    for (int i = height % nrOfSectors; i > 0; --i)
-      sectorHeights[i - 1] += 1;
+    int imgSize = width * height;
+    int[] inDaraArr1D = ImageJUtility.convertFrom2DTo1DIntArr(inDataArrInt, width, height, null);
+    int[] tfArray = ImageTransformationFilter.GetOptimalThresholdTF(255, inDaraArr1D, imgSize, iterations, FG_VAL, BG_VAL);
+    int[] tempResultArr = ImageTransformationFilter.GetTransformed1DImage(inDaraArr1D, imgSize, tfArray);
+    int[][] resultImg = ImageJUtility.convertFrom1DTo2DIntArr(tempResultArr, width, height, null);
 
-    for (int row = 0; row < nrOfSectors; ++row) {
-      // calculate proper height offset for current sector
-      int sectorHeight = sectorHeights[row];
-      if (hOffset != 0 && (hOffset - pxOverlap) > 0) {
-        hOffset -= pxOverlap;
-        sectorHeight += pxOverlap;
-      }
-
-      for (int col = 0; col < nrOfSectors; ++col) {
-        // calculate proper width offset for current sector
-        int sectorWidth = sectorWidths[col];
-        if (wOffset != 0 && (wOffset - pxOverlap) > 0) {
-          wOffset -= pxOverlap;
-          sectorWidth += pxOverlap;
-        }
-
-        // get actual image values for the current sector with offset (if given)
-        int sectorPxSize = sectorWidth * sectorHeight;
-        int[] sector = new int[sectorPxSize];
-        int idx = 0;
-        for (int w = wOffset; w < (wOffset + sectorWidth); ++w) {
-          for (int h = hOffset; h < (hOffset + sectorHeight); ++h) {
-            sector[idx] = inDataArrInt[w][h];
-            ++idx;
-          }
-        }
-
-        // calculate the optimal threshold for the current sector
-        int[] tfArray = ImageTransformationFilter.GetOptimalThresholdTF(
-            255, sector, sectorPxSize, iterations, FG_VAL, BG_VAL);
-        int[] resultImg = ImageTransformationFilter.GetTransformed1DImage(sector, sectorPxSize, tfArray);
-
-        // propagate back the newly calculated image with the optimal threshold applied
-        idx = 0;
-        for (int w = wOffset; w < (wOffset + sectorWidth); ++w) {
-          for (int h = hOffset; h < (hOffset + sectorHeight); ++h) {
-            inDataArrInt[w][h] = resultImg[idx];
-            ++idx;
-          }
-        }
-
-        wOffset += sectorWidth;
-      }
-
-      wOffset = 0;
-      hOffset += sectorHeight;
-    }
-
-    ImageJUtility.showNewImage(inDataArrInt, width, height,
-        String.format(
-            "Optimal Threshold [%d Sectors, %dpx Overlap, %d Iterations]", nrOfSectors, pxOverlap, iterations));
+    ImageJUtility.showNewImage(resultImg, width, height,
+        String.format("Optimal Threshold [%d Iterations]", iterations));
   } //run
+
 
   void showAbout() {
     IJ.showMessage("About OptimalThreshold_...", "This applies the optimal threshold\n");

@@ -208,7 +208,41 @@ public class ImageJUtility {
   public static int[] convertDoubleToIntArr(int size, double[] doubleArr, int[] iArr) {
     if (iArr == null) iArr = new int[size];
     for (int i = 0; i < size; ++i)
-      iArr[i] = (int)doubleArr[i];
+      iArr[i] = (int) doubleArr[i];
     return iArr;
+  }
+
+  public static int[] convertFrom2DTo1DIntArr(int[][] in2DArr, int width, int height,
+                                              int xStartIdx, int yStartIdx, int[] iArr) {
+    if (iArr == null) iArr = new int[width * height];
+    int idx = 0;
+    for (int x = xStartIdx; x < width; ++x) {
+      for (int y = yStartIdx; y < height; ++y) {
+        iArr[idx] = in2DArr[x][y];
+        ++idx;
+      }
+    }
+    return iArr;
+  }
+
+  public static int[] convertFrom2DTo1DIntArr(int[][] in2DArr, int width, int height, int[] iArr) {
+    return convertFrom2DTo1DIntArr(in2DArr, width, height, 0, 0, iArr);
+  }
+
+  public static int[][] convertFrom1DTo2DIntArr(int[] in1DArr, int width, int height,
+                                                int xStartIdx, int yStartIdx, int[][] iArr) {
+    if (iArr == null) iArr = new int[width][height];
+    int idx = 0;
+    for (int x = xStartIdx; x < width; ++x) {
+      for (int y = yStartIdx; y < height; ++y) {
+        iArr[x][y] = in1DArr[idx];
+        ++idx;
+      }
+    }
+    return iArr;
+  }
+
+  public static int[][] convertFrom1DTo2DIntArr(int[] in1DArr, int width, int height, int[][] iArr) {
+    return convertFrom1DTo2DIntArr(in1DArr, width, height, 0, 0, iArr);
   }
 }
