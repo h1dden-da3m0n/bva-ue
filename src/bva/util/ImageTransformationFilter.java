@@ -109,7 +109,7 @@ public class ImageTransformationFilter {
     int lftCnt = 0;
     int rgtSum = 0;
     int rgtCnt = 0;
-    // threshold can be initialized with center of max value: 255/2 = 127.5
+    // threshold can be initialized with center of max value: 255/2 = 127.5 => ~127
     int thold = 127;
 
     // try to improve threshold till optimum or max of iterations is reached
@@ -144,6 +144,7 @@ public class ImageTransformationFilter {
       thold = newThold;
     }
 
+    // build returnTF with FG and BG values
     for (int i = 0; i <= maxVal; ++i) {
       if (i <= thold)
         returnTF[i] = BG_VAL;
