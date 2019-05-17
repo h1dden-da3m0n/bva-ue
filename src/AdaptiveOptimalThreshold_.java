@@ -113,4 +113,3 @@ public class AdaptiveOptimalThreshold_ implements PlugInFilter {
   } //showAbout
 
 } //class FilterTemplate_
-
