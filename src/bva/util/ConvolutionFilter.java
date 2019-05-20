@@ -84,6 +84,17 @@ public class ConvolutionFilter {
     return kernelImg;
   }
 
+  public static double[][] GetMotionMask(int tgtRadius) {
+    int size = 2 * tgtRadius + 1;
+    double[][] kernelImg = new double[size][size];
+
+    for (int x = 0; x < size; ++x) {
+        kernelImg[x][x] = 1.0 * (1.0 / (2 * tgtRadius));
+    }
+
+    return kernelImg;
+  }
+
   public static double[][] GetGaussMask(int tgtRadius, double sigma) {
     int size = 2 * tgtRadius + 1;
     double[][] kernelImg = new double[size][size];
