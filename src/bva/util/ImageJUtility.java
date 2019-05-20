@@ -90,8 +90,8 @@ public class ImageJUtility {
     ip.show();
   }
 
-  public static void showImageCheckerBoard(int nrOfSectors, int width, int height,
-                                           double[][]compImg, double[][] orgImg) {
+  public static void showNewImageCheckerBoard(int nrOfSectors, int width, int height,
+                                              double[][]compImg, double[][] orgImg) {
     double[][] resultImg = new double[width][height];
     int xOffset = 0;
     int yOffset = 0;

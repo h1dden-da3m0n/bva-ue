@@ -90,7 +90,8 @@ public class ConvolutionFilter {
 
     for (int x = -tgtRadius; x <= tgtRadius; ++x) {
       for (int y = -tgtRadius; y <= tgtRadius; ++y) {
-        kernelImg[x + tgtRadius][y + tgtRadius] = (1 / (2 * Math.PI * (sigma * sigma))) * Math.pow(Math.E, -((x * x + y * y) / (2 * (sigma * sigma))));
+        kernelImg[x + tgtRadius][y + tgtRadius] =
+            (1 / (2 * Math.PI * (sigma * sigma))) * Math.pow(Math.E, -((x * x + y * y) / (2 * (sigma * sigma))));
       }
     }
 
