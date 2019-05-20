@@ -31,6 +31,7 @@ public class RichardsonLucyDeconvolution_ implements PlugInFilter {
     gd.addNumericField("Upper Bound:", 1.005, 6);
     gd.addCheckbox("Show iterations:", false);
     gd.addChoice("Init Img:", new String[]{"127-gray", "rand(100,180)"}, "127-gray");
+    gd.addChoice("Blur Kernel:", new String[]{"Gauss", "Mean", "Motion"}, "Gauss");
     gd.showDialog();
     if (gd.wasCanceled()) {
       return;
@@ -40,11 +41,26 @@ public class RichardsonLucyDeconvolution_ implements PlugInFilter {
     double upperBound = gd.getNextNumber();
     boolean showIter = gd.getNextBoolean();
     int initImg = gd.getNextChoiceIndex();
+    String blurFunc = gd.getNextChoice();
 
     // create kernel and based on that observed image
+    double[][] kernel;
+    double[][] observedImg;
     int r = 4;
-    double[][] kernel = ConvolutionFilter.GetGaussMask(r, 0.5 * r);
-    double[][] observedImg = ConvolutionFilter.ConvolveDoubleNorm(inDataArrayDouble, width, height, kernel, r);
+    switch (blurFunc) {
+      case "Gauss":
+        kernel = ConvolutionFilter.GetGaussMask(r, 0.5 * r);
+        observedImg = ConvolutionFilter.ConvolveDoubleNorm(inDataArrayDouble, width, height, kernel, r);
+        break;
+      case "Mean":
+        kernel = ConvolutionFilter.GetMeanMask(r);
+        observedImg = ConvolutionFilter.ConvolveDouble(inDataArrayDouble, width, height, kernel, r);
+        break;
+      default:
+        kernel = ConvolutionFilter.GetMotionMask(r);
+        observedImg = ConvolutionFilter.ConvolveDouble(inDataArrayDouble, width, height, kernel, r);
+        break;
+    }
 
     // create first guess
     // * image of random gray values [100 .. 180]
@@ -66,7 +82,8 @@ public class RichardsonLucyDeconvolution_ implements PlugInFilter {
     double[][][] intermediateImgs = new double[iter + 1][width][height];
     double[][][] coefficientImgs = new double[iter + 1][width][height];
     double avg = 0;
-    for (int i = 0; i < iter; ++i) {
+    int i = 0;
+    while (i < iter) {
       // calculate intermediate image
       intermediateImgs[i] = ConvolutionFilter.ConvolveDoubleNorm(guessedImgs[i], width, height, kernel, r);
 
@@ -96,10 +113,11 @@ public class RichardsonLucyDeconvolution_ implements PlugInFilter {
       }
       if (showIter)
         ImageJUtility.showNewImage(guessedImgs[i], width, height, "RDL [i=" + i + ", deviation=" + avg + "]");
+      ++i;
     }
-    ImageJUtility.showNewImage(guessedImgs[iter], width, height, "RDL [i=" + iter + ", deviation=" + avg + "]");
+    ImageJUtility.showNewImage(guessedImgs[i], width, height, "RDL [i=" + i + ", deviation=" + avg + "]");
     ImageJUtility.showNewImage(observedImg, width, height, "RDL - Observed Image");
-    ImageJUtility.showNewImageCheckerBoard(3, width, height, guessedImgs[iter], observedImg);
+    ImageJUtility.showNewImageChequerboard(3, width, height, guessedImgs[i], observedImg);
   } //run
 
   void showAbout() {
