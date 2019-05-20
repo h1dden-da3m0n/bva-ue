@@ -90,7 +90,7 @@ public class ImageJUtility {
     ip.show();
   }
 
-  public static void showNewImageCheckerBoard(int nrOfSectors, int width, int height,
+  public static void showNewImageChequerboard(int nrOfSectors, int width, int height,
                                               double[][]compImg, double[][] orgImg) {
     double[][] resultImg = new double[width][height];
     int xOffset = 0;
@@ -137,7 +137,7 @@ public class ImageJUtility {
       yOffset += sectorHeight;
     }
 
-    ImageJUtility.showNewImage(resultImg, width, height, "Checkerboard Image");
+    ImageJUtility.showNewImage(resultImg, width, height, "Chequerboard Image");
   }
 
   public enum PlotShapes {

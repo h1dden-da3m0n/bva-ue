@@ -90,7 +90,7 @@ public class AnisotropicDiffusion_ implements PlugInFilter {
     if (!showIter)
       ImageJUtility.showNewImage(imageData, width, height,
           "Anisotropic Diffusion [k=" + k + ", i=" + iter + "]");
-    ImageJUtility.showNewImageCheckerBoard(3, width, height, imageData, inDataArrDouble);
+    ImageJUtility.showNewImageChequerboard(3, width, height, imageData, inDataArrDouble);
   } //run
 
   void showAbout() {

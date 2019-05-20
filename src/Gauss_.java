@@ -57,7 +57,7 @@ public class Gauss_ implements PlugInFilter {
     ImageJUtility.showNewImage(gaussKernel, gaussMaskSize, gaussMaskSize, "Gauss Kernel r=" + tgtRadius);
 
     ImageJUtility.showNewImage(resultImg, width, height, "Image with Gauss Kernel r=" + tgtRadius);
-    ImageJUtility.showNewImageCheckerBoard(3, width, height, resultImg, inDataArrDouble);
+    ImageJUtility.showNewImageChequerboard(3, width, height, resultImg, inDataArrDouble);
   } //run
 
   void showAbout() {
