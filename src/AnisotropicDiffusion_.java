@@ -27,7 +27,7 @@ public class AnisotropicDiffusion_ implements PlugInFilter {
 
     GenericDialog gd = new GenericDialog("Anisotropic Diffusion");
     gd.addSlider("K:", 0, 100, 20, 1);
-    gd.addNumericField("Iter:", 10, 0);
+    gd.addNumericField("Iter.:", 10, 0);
     gd.addCheckbox("Show all Iter:", false);
     gd.showDialog();
     if (gd.wasCanceled()) {
@@ -90,7 +90,7 @@ public class AnisotropicDiffusion_ implements PlugInFilter {
     if (!showIter)
       ImageJUtility.showNewImage(imageData, width, height,
           "Anisotropic Diffusion [k=" + k + ", i=" + iter + "]");
-    ImageJUtility.showImageCheckerBoard(3, width, height, imageData, inDataArrDouble);
+    ImageJUtility.showNewImageCheckerBoard(3, width, height, imageData, inDataArrDouble);
   } //run
 
   void showAbout() {
