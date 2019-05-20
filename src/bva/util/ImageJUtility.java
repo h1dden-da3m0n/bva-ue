@@ -90,6 +90,56 @@ public class ImageJUtility {
     ip.show();
   }
 
+  public static void showImageCheckerBoard(int nrOfSectors, int width, int height,
+                                           double[][]compImg, double[][] orgImg) {
+    double[][] resultImg = new double[width][height];
+    int xOffset = 0;
+    int yOffset = 0;
+
+    // get px per Sector
+    int[] sectorWidths = new int[nrOfSectors];
+    int[] sectorHeights = new int[nrOfSectors];
+    for (int i = 0; i < nrOfSectors; ++i) {
+      sectorWidths[i] = width / nrOfSectors;
+      sectorHeights[i] = height / nrOfSectors;
+    }
+    // add rest of px if height or width isn't a multiple of nrOfSectors
+    for (int i = width % nrOfSectors; i > 0; --i)
+      sectorWidths[i - 1] += 1;
+    for (int i = height % nrOfSectors; i > 0; --i)
+      sectorHeights[i - 1] += 1;
+
+    boolean imageToggle = true; // true=compImg, false=orgImg used
+    for (int row = 0; row < nrOfSectors; ++row) {
+      int sectorHeight = sectorHeights[row];
+
+      for (int col = 0; col < nrOfSectors; ++col) {
+        int sectorWidth = sectorWidths[col];
+
+        // get actual image values for the current sector with offset (if given)
+        int adjustedEndX = (xOffset + sectorWidth);
+        int adjustedEndY = (yOffset + sectorHeight);
+
+        for (int w = xOffset; w < adjustedEndX; ++w) {
+          for (int h = yOffset; h < adjustedEndY; ++h) {
+             if (imageToggle)
+               resultImg[w][h] = compImg[w][h];
+             else
+               resultImg[w][h] = orgImg[w][h];
+          }
+        }
+
+        imageToggle = !imageToggle;
+        xOffset += sectorWidth;
+      }
+
+      xOffset = 0;
+      yOffset += sectorHeight;
+    }
+
+    ImageJUtility.showNewImage(resultImg, width, height, "Checkerboard Image");
+  }
+
   public enum PlotShapes {
     BAR("bar"),
     DOT("dot"),
